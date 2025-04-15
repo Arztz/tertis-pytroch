@@ -8,7 +8,7 @@ class Score:
 
         self.increment_height = self.surface.get_height() / 3
         #font
-        self.font = pygame.font.Font(join('graphics','Russo_One.ttf'),30)
+        self.font = pygame.font.Font(join('..','graphics','Russo_One.ttf'),30)
 
         self.level = 1
         self.score = 0
