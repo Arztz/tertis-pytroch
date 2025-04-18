@@ -21,13 +21,14 @@ import matplotlib
 from matplotlib import pyplot as plt
 import graph
 from graph_utils import ShowGraph
+from setting import *
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 RUNS_DIR = "runs"
 os.makedirs(RUNS_DIR, exist_ok=True)
 matplotlib.use('Agg')
 # g = graph.ShowGraph()
-g = ShowGraph(log_dir='runs/')
+g = ShowGraph(log_dir=f'runs/{datetime.datetime.now()}')
 torch.set_num_threads(22)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 class Main:
@@ -73,16 +74,17 @@ class Main:
         #component
         if render:
             self.game = Game(self.get_next_shape,self.update_score,render)
+            self.score = Score()
+            self.preview = Preview()
         else:
             self.game = Game(self.get_next_shape,None,False)
-        # self.score = Score()
-        # self.preview = Preview()
+
 
         #audio
         # self.music = pygame.mixer.Sound(join('sound','music.wav'))
         # self.music.set_volume(0.05)
         # self.music.play(-1)
-    def optimize(self, mini_batch, policy_dqn, target_dqn):
+    def optimize(self, mini_batch, policy_dqn, target_dqn,episode):
         pic,states,actions,new_pic,new_states,rewards,terminations = zip(*mini_batch)
         pic = torch.cat(pic, dim=0).to(device)
         # print("pic.shape =", pic.shape)
@@ -98,7 +100,7 @@ class Main:
 
             if self.enable_double_dqn:
                 best_actions_from_policy = policy_dqn(pic,new_states).argmax(dim=1)
-                target_q = rewards + (1-terminations )* self.discount_factor_g  * target_dqn(new_pic,new_states).gather(dim=1,index=best_actions_from_policy.unsqueeze(dim=1)).squeeze()
+                target_q = rewards + (1-terminations )* self.discount_factor_g  * target_dqn(new_pic,new_states,episode).gather(dim=1,index=best_actions_from_policy.unsqueeze(dim=1)).squeeze()
             else:
                 target_q = rewards + (1-terminations )* self.discount_factor_g  * target_dqn(new_pic,new_states).max(dim=1)[0]
 
@@ -160,7 +162,6 @@ class Main:
         env = self.game
         reward_per_episode = []
         epsilon_history = []
-
         num_states = env.observation_space.shape[0]
         num_actions = env.action_space.n
 
@@ -243,7 +244,7 @@ class Main:
                     state = env.reset()
             
             reward_per_episode.append(episode_reward)    
-            print(f"Episode {episode} Reward {episode_reward} Score: {score}")
+            # print(f"Episode {episode} Reward {episode_reward} Score: {score}")
             if episode % 50 ==0:
                 pic_data = new_pic.squeeze().cpu().numpy().astype(int)
 
@@ -268,7 +269,7 @@ class Main:
                 if len(memory) > self.mini_batch_size:
                                             #sample from memory
                     mini_batch = memory.sample(self.mini_batch_size)
-                    self.optimize(mini_batch,policy_dqn,target_dqn)
+                    self.optimize(mini_batch,policy_dqn,target_dqn,episode=episode)
                     epsilon = max(epsilon * self.epsilon_decay,self.epsilon_min)
                     epsilon_history.append(epsilon)
                     
@@ -287,12 +288,12 @@ if __name__ == "__main__":
     parser.add_argument('--train',help='Training mode',action='store_true')
     args = parser.parse_args()
 
-    dql = Main(hyperparameters_set=args.hyperparameters,render=False)
+    dql = Main(hyperparameters_set=args.hyperparameters,render=RENDER)
     try:
         if args.train:
-            dql.train(is_training=True,render=False)
+            dql.train(is_training=True,render=RENDER)
         else:
-            dql.train(is_training=False,render=True)
+            dql.train(is_training=False,render=RENDER)
     finally:
         
         g.close()

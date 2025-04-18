@@ -142,7 +142,7 @@ class Game:
             self.timers['vertical move'].duration = self.down_speed
         if render:
             self.update_score(self.current_lines,self.current_score,self.current_level)
-
+        # print(f"Get Reward: {self.reward}, Score: {self.current_score}")
 
     def check_game_over(self):
         for block in self.tetromino.blocks:
@@ -262,7 +262,7 @@ class Game:
             for block in self.sprites:
                 self.field_data[int(block.pos.y)][int(block.pos.x)] = block
 
-            self.calculate_score(len(delete_rows))
+            self.calculate_score(len(delete_rows),RENDER)
     def get_data(self):
         data = [[0 for x in range(COLUMNS)] for y in range(ROWS)]
         for y in range(ROWS):
@@ -270,24 +270,24 @@ class Game:
                 if isinstance(self.field_data[y][x], Block):
                     data[y][x] = 1
         return data
-    # def check_dangerrous(self):
-    #         danger_columns = []
-    #         data_np = np.array(self.data)
-    #         for col in range(data_np.shape[1]):  # สำหรับแต่ละคอลัมน์
-    #             column_data = data_np[:, col]  # ดึงคอลัมน์ออกมา
+    def check_dangerrous(self):
+            danger_columns = []
+            data_np = np.array(self.data)
+            for col in range(data_np.shape[1]):  # สำหรับแต่ละคอลัมน์
+                column_data = data_np[:, col]  # ดึงคอลัมน์ออกมา
 
-    #             ones_indices = np.where(column_data == 1)[0]  # หาตำแหน่งที่เป็น 1
-    #             if len(ones_indices) >= 2:
-    #                 # ถ้ามี 1 มากกว่า 1 จุด และไม่ติดกันทั้งหมด (ห่างกันเกิน 1)
-    #                 if not np.all(np.diff(ones_indices) == 1):
-    #                     danger_columns.append(col)
-    #                     self.reward = -5
-    #                     return True
-    #         if danger_columns.count == 0:
-    #             self.reward = 0.1
-    #             return False
+                ones_indices = np.where(column_data == 1)[0]  # หาตำแหน่งที่เป็น 1
+                if len(ones_indices) >= 2:
+                    # ถ้ามี 1 มากกว่า 1 จุด และไม่ติดกันทั้งหมด (ห่างกันเกิน 1)
+                    if not np.all(np.diff(ones_indices) == 1):
+                        danger_columns.append(col)
+                        self.reward = -5
+                        return True
+            # if danger_columns.count == 0:
+            #     self.reward = 0.1
+            #     return False
     def is_low_and_flat(self):
-        data_np = np.array(self.data)
+        data_np = np.array(self.data).T
         filled_rows = [np.sum(row) for row in data_np]
 
         lower_half = filled_rows[-5:]  # แถวล่าง 50%
@@ -295,10 +295,10 @@ class Game:
 
         # ถ้าเฉลี่ยการเติมแถวล่างมากกว่า 70% แปลว่าเตี้ยและแบน
         if avg_fill >= data_np.shape[1] * 0.7:
-            
+            self.reward = -0.1
             return True
         else:
-            self.reward = 1
+            self.reward = 0.1
             # self.reward = 1
             return False 
 
@@ -311,7 +311,7 @@ class Game:
         # print(action)
         self.input(action)
         self.tetromino.move_down() 
-        # Flat = self.is_low_and_flat()
+        # Flat = self.check_dangerrous()
         if self.render:
 
             self.sprites.update()
@@ -347,7 +347,7 @@ class Tetromino:
         self.field_data = field_data
 
         #create block
-        self.blocks = [Block(group,pos,self.color) for pos in self.block_pos]
+        self.blocks = [Block(group,pos,self.color,RENDER) for pos in self.block_pos]
         
     def move_down(self):
         if not self.next_move_vertical_collide(self.blocks,1):
