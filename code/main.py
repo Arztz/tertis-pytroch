@@ -227,6 +227,7 @@ class Main:
                 episode_reward += reward
                 new_pic = torch.as_tensor(new_pic,dtype=torch.float,device=device).unsqueeze(0).unsqueeze(0)
                 new_state = torch.as_tensor(new_state,dtype=torch.float,device=device).unsqueeze(0)
+                
                 # print("new_pic", new_pic.shape)      # → (1, 1, 20, 10)
                 # print("new_state", new_state.shape)  # → (1, 33)
                 reward = torch.as_tensor(reward,dtype=torch.float,device=device)
@@ -241,7 +242,7 @@ class Main:
                 self.clock.tick()
                 done = terminated# or truncated 
                 if done:
-                    state = env.reset()
+                    break
             
             reward_per_episode.append(episode_reward)    
             # print(f"Episode {episode} Reward {episode_reward} Score: {score}")
