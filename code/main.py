@@ -218,7 +218,7 @@ class Main:
                         action = policy_dqn(pic,state.unsqueeze(dim=0)).squeeze().argmax()
                         
                 # Processing:
-                new_pic,new_state, reward, terminated = env.run(action.item())
+                new_pic,new_state, reward, terminated ,score= env.run(action.item())
                 # print(action)
                 # print(f"Terminated: {terminated}")
                 # reward += 0.01
@@ -243,7 +243,7 @@ class Main:
                     state = env.reset()
             
             reward_per_episode.append(episode_reward)    
-            print(f"Episode {episode} Reward {episode_reward} ")
+            print(f"Episode {episode} Reward {episode_reward} Score: {score}")
             if episode % 50 ==0:
                 pic_data = new_pic.squeeze().cpu().numpy().astype(int)
 

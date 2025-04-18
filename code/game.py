@@ -295,10 +295,11 @@ class Game:
 
         # ถ้าเฉลี่ยการเติมแถวล่างมากกว่า 70% แปลว่าเตี้ยและแบน
         if avg_fill >= data_np.shape[1] * 0.7:
-            self.reward = 1
+            
             return True
         else:
-            self.reward = -1
+            self.reward = 1
+            # self.reward = 1
             return False 
 
     def run(self,action=None):
@@ -328,14 +329,14 @@ class Game:
         # input("Press Enter to continue...")
         if self.terminated:
             if self.current_score < 40:  # เล่นแป๊บเดียวก็ตาย
-                self.reward = -10
+                self.reward = -80
             elif self.current_lines == 0:
-                self.reward = -20  # ไม่ได้เคลียร์แถวเลย
+                self.reward = -100  # ไม่ได้เคลียร์แถวเลย
 
         return_reward = self.reward
         self.reward = 0
         # print(return_reward)
-        return pic, obs, return_reward, self.terminated
+        return pic, obs, return_reward, self.terminated,self.current_score
 
 class Tetromino:
     def __init__(self,shape,group,create_new_tetromino,field_data):
