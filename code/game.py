@@ -311,7 +311,7 @@ class Game:
         # print(action)
         self.input(action)
         self.tetromino.move_down() 
-        Flat = self.is_low_and_flat()
+        # Flat = self.is_low_and_flat()
         if self.render:
 
             self.sprites.update()

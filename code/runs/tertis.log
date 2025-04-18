@@ -1,6 +1,7 @@
-DDQN Start time: 2025-04-18 09:12:35.740265
-2025-04-18 09:12:36: New best reward: 504.0 at episode 0
-2025-04-18 09:12:36: New best reward: 1063.0 at episode 1
-2025-04-18 09:12:37: New best reward: 2060.0 at episode 2
-2025-04-18 09:12:59: New best reward: 2952.0 at episode 87
-2025-04-18 09:13:43: New best reward: 3398.0 at episode 238
+DDQN Start time: 2025-04-18 10:42:07.468464
+2025-04-18 10:42:08: New best reward: -80.0 at episode 0
+2025-04-18 10:42:08: New best reward: 20.0 at episode 1
+2025-04-18 10:42:09: New best reward: 40.0 at episode 4
+2025-04-18 10:42:10: New best reward: 100.0 at episode 9
+2025-04-18 10:42:11: New best reward: 120.0 at episode 15
+2025-04-18 10:42:37: New best reward: 220.0 at episode 110
